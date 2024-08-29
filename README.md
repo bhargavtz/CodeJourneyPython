@@ -1,7 +1,3 @@
-Here's an enhanced version of the README with additional information and details:
-
----
-
 # 🚀 CodeJourneyPython
 
 Welcome to **CodeJourneyPython**! Embark on an exciting adventure through the world of Python programming. This repository is your companion on a journey from beginner to advanced Python developer, filled with projects, tutorials, and resources to guide your way.

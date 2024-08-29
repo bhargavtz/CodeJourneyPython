@@ -26,6 +26,9 @@ def guess_the_number():
                 guessed = True
         except ValueError:
             print("Please enter a valid integer.")
+        except KeyboardInterrupt:
+            print("\nGame interrupted by user.")
+            break
 
 # Run the game
 if __name__ == "__main__":

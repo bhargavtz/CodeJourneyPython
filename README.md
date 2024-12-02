@@ -77,8 +77,8 @@ Navigate through Python concepts with our guided tutorials, tailored for differe
 Equip yourself with these essential Python resources:
 
 - [Python Survival Guides (Cheatsheets)](./resources/cheatsheets): Quick reference guides for Python syntax, data structures, OOP, and more.
-- [Map of the Python Ecosystem (Useful Links)](./resources/useful_links.md): Curated links to official documentation, community forums, and other valuable resources.
-- **Virtual Tools**: Learn to set up virtual environments and use tools like `pip` and `conda` to manage your Python packages.
+- [Map of the Python Ecosystem (Useful Links)](./resources/README.md): Curated links to official documentation, community forums, and other valuable resources.
+- [Virtual Tools: Mastering Your Python Environment](./resources/Virtual%20tools/README.md): Learn to set up virtual environments and use tools like `pip` and `conda` to manage your Python packages.
 - **Python Libraries Overview**: Explore popular libraries like NumPy, Pandas, TensorFlow, Keras, and more.
 
 ---

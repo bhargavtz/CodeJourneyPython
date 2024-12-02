@@ -4,8 +4,10 @@ Welcome to **CodeJourneyPython**! Embark on an exciting adventure through the wo
 
 ![Python Version](https://img.shields.io/badge/python-3.7%2B-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
-![Last Updated](https://img.shields.io/badge/last%20updated-August%202023-brightgreen)
+![Last Updated](https://img.shields.io/badge/last%20updated-December%202024-brightgreen)
 ![Contributions Welcome](https://img.shields.io/badge/contributions-welcome-orange)
+
+---
 
 ## 🗺️ Table of Contents
 
@@ -19,6 +21,8 @@ Welcome to **CodeJourneyPython**! Embark on an exciting adventure through the wo
 - [Your Guide](#your-guide)
 - [Support and Community](#support-and-community)
 
+---
+
 ## 🌟 The Journey Ahead
 
 **CodeJourneyPython** is designed to be your trusted guide through the vast landscape of Python programming. Here's what you'll discover on your journey:
@@ -28,6 +32,8 @@ Welcome to **CodeJourneyPython**! Embark on an exciting adventure through the wo
 - **Travel Kit**: Essential resources, cheatsheets, and references to ensure you're well-prepared for every challenge.
 
 Whether you're just starting out or looking to refine your skills, CodeJourneyPython has something for everyone.
+
+---
 
 ## 🏆 Milestones (Projects)
 
@@ -40,6 +46,8 @@ Chart your progress with these Python projects that grow in complexity as you ad
 5. **Final Frontier**: Contribute to an open-source Python project or create a complex application of your choice.
 
 [Explore all milestones](./projects)
+
+---
 
 ## 🧭 Learning Paths (Tutorials)
 
@@ -62,6 +70,8 @@ Navigate through Python concepts with our guided tutorials, tailored for differe
 
 [Discover all learning paths](./tutorials)
 
+---
+
 ## 🎒 Travel Kit (Resources)
 
 Equip yourself with these essential Python resources:
@@ -70,6 +80,8 @@ Equip yourself with these essential Python resources:
 - [Map of the Python Ecosystem (Useful Links)](./resources/useful_links.md): Curated links to official documentation, community forums, and other valuable resources.
 - **Virtual Tools**: Learn to set up virtual environments and use tools like `pip` and `conda` to manage your Python packages.
 - **Python Libraries Overview**: Explore popular libraries like NumPy, Pandas, TensorFlow, Keras, and more.
+
+---
 
 ## 🏕️ First Steps
 
@@ -85,6 +97,8 @@ To begin your CodeJourneyPython adventure:
    ```
 3. **Start exploring** the projects, tutorials, and resources folders.
 
+---
+
 ## 🤝 Join the Expedition (Contributing)
 
 We welcome fellow explorers to contribute to CodeJourneyPython! Here’s how you can join:
@@ -97,15 +111,21 @@ We welcome fellow explorers to contribute to CodeJourneyPython! Here’s how you
 
 Please read our [Expedition Guidelines](CONTRIBUTING.md) for more details on how to contribute effectively.
 
+---
+
 ## 📜 Code of Conduct
 
 This project adheres to a [Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code and help maintain a welcoming and inclusive community.
+
+---
 
 ## 🧑‍🚀 Your Guide
 
 **Bhargavtz** - [@bhargavtz](https://twitter.com/bhargavtz) - bhargav05@yandex.com
 
 Expedition Base: [https://github.com/bhargavtz/CodeJourneyPython](https://github.com/bhargavtz/CodeJourneyPython)
+
+---
 
 ## 🌍 Support and Community
 
@@ -118,4 +138,3 @@ Join our community of Python explorers:
 ---
 
 ⭐️ If this journey has been helpful, consider marking it with a star on GitHub! Your support motivates us to keep improving and expanding this resource.
-

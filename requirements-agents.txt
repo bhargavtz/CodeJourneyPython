@@ -1,0 +1,17 @@
+# AI Agents & LLM Dependencies
+# Install with: pip install -r requirements-agents.txt
+
+# Anthropic Claude API
+anthropic==0.7.8
+
+# OpenAI API
+openai==1.6.2
+
+# Agent frameworks
+langchain==0.1.4
+langchain-anthropic==0.1.4
+langchain-openai==0.0.6
+
+# Utilities
+python-dotenv==1.0.0
+requests==2.31.0

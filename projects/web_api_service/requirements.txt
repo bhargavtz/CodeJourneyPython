@@ -1,0 +1,48 @@
+# Final Frontier: Full-Stack Web Application - Dependencies
+
+# Web Framework & API
+fastapi>=0.104.0              # Web framework
+uvicorn>=0.24.0               # ASGI server
+pydantic>=2.0.0               # Data validation
+python-multipart>=0.0.6       # File upload support
+
+# Database
+sqlalchemy>=2.0.0             # ORM
+psycopg2-binary>=2.9.0        # PostgreSQL adapter
+alembic>=1.12.0               # Database migrations
+
+# Authentication & Security
+python-jose>=3.3.0            # JWT tokens
+passlib>=1.7.4                # Password hashing
+bcrypt>=4.0.1                 # Bcrypt hashing
+cryptography>=41.0.0          # Encryption
+
+# Data Processing
+pandas>=1.5.0                 # Data manipulation
+numpy>=1.23.0                 # Numerical computing
+
+# ML Integration
+scikit-learn>=1.3.0           # ML models
+joblib>=1.3.0                 # Model persistence
+
+# AI Agent (Claude API)
+anthropic>=0.20.0             # Claude API client
+
+# Environment & Config
+python-dotenv>=1.0.0          # Environment variables
+pydantic-settings>=2.0.0      # Settings management
+
+# Logging & Monitoring
+python-json-logger>=2.0.0     # Structured logging
+prometheus-client>=0.18.0     # Metrics (optional)
+
+# Development
+pytest>=7.4.0                 # Testing
+pytest-asyncio>=0.21.0        # Async test support
+pytest-cov>=4.1.0             # Coverage reporting
+black>=23.0.0                 # Code formatting
+flake8>=6.0.0                 # Linting
+mypy>=1.0.0                   # Type checking
+
+# Documentation
+sphinx>=5.0.0                 # Doc generation

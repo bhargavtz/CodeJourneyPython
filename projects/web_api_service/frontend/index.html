@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Final Frontier - AI/ML Platform</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Navigation -->
+        <nav class="navbar">
+            <div class="container">
+                <h1 class="logo">🚀 Final Frontier</h1>
+                <ul class="nav-menu">
+                    <li><a href="#dashboard" onclick="showPage('dashboard')">Dashboard</a></li>
+                    <li><a href="#chat" onclick="showPage('chat')">AI Chat</a></li>
+                    <li><a href="#ml" onclick="showPage('ml')">Recommendations</a></li>
+                    <li><a href="#upload" onclick="showPage('upload')">Data Upload</a></li>
+                    <li><a href="#" onclick="logout()">Logout</a></li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Auth Section -->
+        <div id="auth-section" class="container">
+            <div class="auth-forms">
+                <div class="form-group">
+                    <h2>Login / Register</h2>
+                    <input type="email" id="email" placeholder="Email" />
+                    <input type="password" id="password" placeholder="Password" />
+                    <button onclick="login()">Login</button>
+                    <button onclick="register()">Register</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Page -->
+        <div id="dashboard" class="page hidden">
+            <div class="container">
+                <h2>Dashboard</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3>Predictions Made</h3>
+                        <p id="predictions-count">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Model Accuracy</h3>
+                        <p>72%</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Data Processed</h3>
+                        <p>1000+ rows</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Chat Sessions</h3>
+                        <p id="chat-sessions">0</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat Page -->
+        <div id="chat" class="page hidden">
+            <div class="container">
+                <h2>AI Agent Chat</h2>
+                <div class="chat-container">
+                    <div id="messages" class="messages"></div>
+                    <div class="input-group">
+                        <input type="text" id="chat-input" placeholder="Ask AI Agent..." />
+                        <button onclick="sendMessage()">Send</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ML Page -->
+        <div id="ml" class="page hidden">
+            <div class="container">
+                <h2>Get Recommendations</h2>
+                <div class="form-group">
+                    <input type="number" id="user-id" placeholder="User ID" value="1" />
+                    <input type="number" id="num-recs" placeholder="Number of Recommendations" value="10" />
+                    <button onclick="getRecommendations()">Get Recommendations</button>
+                </div>
+                <div id="recommendations" class="results"></div>
+            </div>
+        </div>
+
+        <!-- Upload Page -->
+        <div id="upload" class="page hidden">
+            <div class="container">
+                <h2>Upload & Process Data</h2>
+                <div class="form-group">
+                    <input type="text" id="dataset-name" placeholder="Dataset Name" />
+                    <input type="file" id="file-input" accept=".csv,.json" />
+                    <button onclick="uploadFile()">Upload & Process</button>
+                </div>
+                <div id="upload-status" class="results"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/chat.js"></script>
+</body>
+</html>

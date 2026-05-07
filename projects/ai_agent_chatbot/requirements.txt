@@ -1,0 +1,12 @@
+# AI Agent Chatbot - Project Dependencies
+
+# Core dependencies
+anthropic>=0.20.0          # Claude API client
+python-dotenv>=1.0.0       # Environment variable management
+
+# Development dependencies (optional)
+pytest>=7.4.0              # Testing framework
+pytest-cov>=4.1.0          # Coverage reporting
+black>=23.0.0              # Code formatting
+flake8>=6.0.0              # Linting
+mypy>=1.0.0                # Type checking

@@ -19,6 +19,7 @@ pip install -r requirements-dev.txt          # core dev tooling (pytest, black, 
 pip install -r requirements-ml.txt            # only if touching ML projects/libraries
 pip install -r requirements-agents.txt        # only if touching ai_agent_chatbot
 pip install -r requirements-web.txt           # only if touching a web project
+pip install -r projects/ai_agents/requirements.txt   # only if touching projects/ai_agents
 pre-commit install
 ```
 
@@ -50,8 +51,11 @@ mypy.
 - `projects/<name>/` — one folder per project, each independently runnable (`main.py` or
   equivalent entry point) with its own `README.md`, `requirements.txt`, and `tests/` package.
   Existing projects: `guess_the_number` (CLI basics), `ai_agent_chatbot` (LLM agent + tool use),
-  `data_pipeline_etl` (ETL pipeline). Note: CONTRIBUTING.md references `ml_recommendation` and
-  `web_api_service` as planned/example projects — they do not exist yet in `projects/`.
+  `data_pipeline_etl` (ETL pipeline), `ai_agents` (five educational agent implementations —
+  tool use, ReAct reasoning, multi-agent teams, memory/RAG, planning; see its own README and
+  `CLAUDE.md`-equivalent hub doc at `projects/ai_agents/README.md`). Note: CONTRIBUTING.md
+  references `ml_recommendation` and `web_api_service` as planned/example projects — they do
+  not exist yet in `projects/`.
 - `projects/utils/` — the only code shared across projects: `config.py` (env-var/`.env`-backed
   `Config` class), `errors.py` (exception hierarchy), `logging_config.py` (`setup_logger`/
   `get_logger` with rotating file handlers). New projects are expected to reuse these rather than
@@ -81,6 +85,17 @@ mypy.
   `docstring-convention = google` setting.
 - **Tests**: colocated under `projects/<name>/tests/test_<module>.py`, class-based
   (`TestXxx`/`test_xxx`), using pytest fixtures for setup.
+- **Imports — two conventions coexist, only one actually works from the repo root**:
+  `guess_the_number` and `ai_agents` use absolute imports rooted at `projects.` (e.g.
+  `from projects.ai_agents.agent1_web_search.agent import WebSearchAgent`), which is what
+  makes `python -m pytest projects/ -v` succeed. `ai_agent_chatbot` instead uses flat,
+  package-relative imports (`from agent import AIAgent`) that only resolve when run with
+  that project's own directory on `sys.path` (e.g. `cd`'d into it) — running the documented
+  `pytest projects/` from the repo root currently fails to collect
+  `ai_agent_chatbot/tests/test_agent.py` with `ModuleNotFoundError: No module named 'agent'`.
+  This is a pre-existing inconsistency, not a regression to "fix" reflexively — but always
+  write **new** code using the `projects.`-rooted absolute-import style, and don't assume
+  `pytest projects/` is fully green until you've checked.
 
 ### Adding a new project
 Follow the structure in CONTRIBUTING.md: `projects/<name>/{__init__.py, main.py, module.py,

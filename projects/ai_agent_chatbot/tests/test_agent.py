@@ -4,6 +4,7 @@ Unit tests for AI Agent implementation.
 Tests core agent functionality including:
 - Agent initialization
 - Conversation management
+- Tool execution
 - Error handling
 - State tracking
 
@@ -11,9 +12,28 @@ Author: CodeJourney AI Project
 License: MIT
 """
 
+from unittest.mock import MagicMock, patch
+
 import pytest
-from unittest.mock import Mock, MagicMock, patch
-from agent import AIAgent, ConversationState, Message
+
+from projects.ai_agent_chatbot.agent import AIAgent, ConversationState, Message
+
+
+def _text_block(text):
+    """Build a fake Anthropic content block that is text-only."""
+    return MagicMock(type="text", text=text)
+
+
+def _tool_use_block(name, tool_input, tool_id="tool_1"):
+    """Build a fake Anthropic content block requesting a tool call.
+
+    Note: ``name`` can't be passed as a MagicMock constructor kwarg -- that
+    sets the mock's internal debug name, not a ``.name`` attribute -- so it
+    has to be assigned afterward.
+    """
+    block = MagicMock(type="tool_use", input=tool_input, id=tool_id)
+    block.name = name
+    return block
 
 
 class TestMessage:
@@ -80,7 +100,7 @@ class TestAIAgent:
     @pytest.fixture
     def agent(self, mock_api_key):
         """Create agent instance with mocked API."""
-        with patch("agent.Anthropic"):
+        with patch("projects.ai_agent_chatbot.agent.Anthropic"):
             agent = AIAgent(api_key=mock_api_key)
             agent.client = MagicMock()
             return agent
@@ -90,17 +110,26 @@ class TestAIAgent:
         assert agent.model == "claude-opus-4-7"
         assert agent.max_tokens == 2048
         assert agent.system_prompt is not None
+        assert agent.tool_executor is None
 
     def test_invalid_api_key(self):
         """Test that empty API key raises error."""
         with pytest.raises(ValueError):
             AIAgent(api_key="")
 
-    def test_register_tools(self, agent):
-        """Test registering tools."""
+    def test_register_tools_without_executor(self, agent):
+        """Test registering tools without an executor (backwards compatible)."""
         tools = [{"name": "test", "description": "Test tool"}]
         agent.register_tools(tools)
         assert len(agent.tools) == 1
+        assert agent.tool_executor is None
+
+    def test_register_tools_with_executor(self, agent):
+        """Test registering tools together with their executor."""
+        tools = [{"name": "test", "description": "Test tool"}]
+        executor = MagicMock(return_value="42")
+        agent.register_tools(tools, executor=executor)
+        assert agent.tool_executor is executor
 
     def test_clear_conversation(self, agent):
         """Test clearing conversation."""
@@ -149,9 +178,7 @@ class TestAIAgent:
 
         # Mock json.load
         with patch("json.load") as mock_json:
-            mock_json.return_value = {
-                "messages": [{"role": "user", "content": "Hi"}]
-            }
+            mock_json.return_value = {"messages": [{"role": "user", "content": "Hi"}]}
             agent.load_conversation("test.json")
 
 
@@ -161,12 +188,11 @@ class TestAgentChat:
     @pytest.fixture
     def agent_with_mock_api(self):
         """Agent with mocked API responses."""
-        with patch("agent.Anthropic") as mock_anthropic:
+        with patch("projects.ai_agent_chatbot.agent.Anthropic") as mock_anthropic:
             mock_instance = MagicMock()
 
             # Mock response
-            mock_response = MagicMock()
-            mock_response.content = [MagicMock(text="Hello! How can I help?")]
+            mock_response = MagicMock(content=[_text_block("Hello! How can I help?")])
             mock_instance.messages.create.return_value = mock_response
 
             mock_anthropic.return_value = mock_instance
@@ -193,6 +219,66 @@ class TestAgentChat:
         agent_with_mock_api.chat("How are you?")
         history = agent_with_mock_api.get_conversation_history()
         assert len(history) == 4
+
+    def test_chat_executes_a_requested_tool(self):
+        """A tool_use response should actually run the registered executor."""
+        with patch("projects.ai_agent_chatbot.agent.Anthropic") as mock_anthropic:
+            client = MagicMock()
+            tool_call_response = MagicMock(
+                content=[_tool_use_block("calculator", {"expression": "2 + 2"})]
+            )
+            final_response = MagicMock(content=[_text_block("2 + 2 = 4")])
+            client.messages.create.side_effect = [tool_call_response, final_response]
+            mock_anthropic.return_value = client
+
+            agent = AIAgent(api_key="test-key")
+            executor = MagicMock(return_value="2 + 2 = 4")
+            agent.register_tools([{"name": "calculator"}], executor=executor)
+
+            response = agent.chat("What is 2 + 2?")
+
+        executor.assert_called_once_with("calculator", expression="2 + 2")
+        assert response == "2 + 2 = 4"
+        assert agent.state.tool_uses == 1
+
+    def test_chat_reports_missing_executor_to_the_model(self):
+        """If a tool is requested but no executor is registered, the model
+        should be told so (as a tool_result) instead of the agent crashing."""
+        with patch("projects.ai_agent_chatbot.agent.Anthropic") as mock_anthropic:
+            client = MagicMock()
+            tool_call_response = MagicMock(
+                content=[_tool_use_block("calculator", {"expression": "2 + 2"})]
+            )
+            final_response = MagicMock(content=[_text_block("I couldn't run that tool.")])
+            client.messages.create.side_effect = [tool_call_response, final_response]
+            mock_anthropic.return_value = client
+
+            agent = AIAgent(api_key="test-key")
+            agent.register_tools([{"name": "calculator"}])  # no executor
+
+            response = agent.chat("What is 2 + 2?")
+
+        second_call_messages = client.messages.create.call_args_list[1].kwargs["messages"]
+        tool_result_content = second_call_messages[-1]["content"][0]["content"]
+        assert "no tool executor registered" in tool_result_content
+        assert response == "I couldn't run that tool."
+
+    def test_chat_gives_up_after_max_tool_rounds(self):
+        """The agent should not loop forever if the model keeps calling tools."""
+        with patch("projects.ai_agent_chatbot.agent.Anthropic") as mock_anthropic:
+            client = MagicMock()
+            looping_response = MagicMock(
+                content=[_tool_use_block("calculator", {"expression": "1 + 1"})]
+            )
+            client.messages.create.return_value = looping_response
+            mock_anthropic.return_value = client
+
+            agent = AIAgent(api_key="test-key")
+            agent.register_tools([{"name": "calculator"}], executor=MagicMock(return_value="2"))
+
+            response = agent.chat("Keep calculating forever")
+
+        assert "wasn't able to finish" in response
 
 
 if __name__ == "__main__":

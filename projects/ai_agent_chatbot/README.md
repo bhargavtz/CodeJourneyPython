@@ -34,15 +34,18 @@ By completing this project, you'll understand:
 
 ### 1. Setup
 
+Run everything from the **repository root** (not from inside this folder), so the
+`projects` package resolves — see `CLAUDE.md` for why.
+
 ```bash
 # Create virtual environment
 python3 -m venv venv
 source venv/bin/activate
 
 # Install dependencies
-pip install -r requirements.txt
+pip install -r projects/ai_agent_chatbot/requirements.txt
 
-# Set API key (create .env file)
+# Set API key (create .env file at the repo root)
 cat > .env << EOF
 ANTHROPIC_API_KEY=sk-ant-your-key-here
 EOF
@@ -52,34 +55,33 @@ EOF
 
 ```bash
 # Interactive CLI mode
-python main.py
+python -m projects.ai_agent_chatbot.main
 
 # Run tests
-pytest tests/ -v
+python -m pytest projects/ai_agent_chatbot/tests/ -v
 
 # Run with verbose logging
-DEBUG=1 python main.py
+python -m projects.ai_agent_chatbot.main --debug
 ```
 
 ### 3. Example Interaction
 
 ```
-$ python main.py
+$ python -m projects.ai_agent_chatbot.main
 
-AI Agent Chatbot
-Type 'exit' to quit, 'clear' to reset conversation
+🤖 AI Agent Chatbot
+Type 'help' for commands, 'exit' to quit
 
-User: What's 15 * 27 + 42?
+You: What's 15 * 27 + 42?
 Agent: I'll calculate that for you.
-[Using tool: calculator]
 15 * 27 + 42 = 447
 
-User: How far is the Moon from Earth?
+You: How far is the Moon from Earth?
 Agent: The Moon is approximately 384,400 kilometers (238,855 miles) from Earth...
-[Using tool: web_search]
 
-User: exit
-Goodbye!
+You: exit
+
+Goodbye! 👋
 ```
 
 ## Project Structure
@@ -89,17 +91,12 @@ projects/ai_agent_chatbot/
 ├── README.md                    # This file
 ├── requirements.txt             # Project dependencies
 ├── .env.example                 # Environment variables template
-├── main.py                      # CLI entry point
-├── agent.py                     # Core agent implementation
-├── tools.py                     # Tool definitions (calculator, search, etc.)
-├── config.py                    # Configuration management
-├── utils.py                     # Helper functions
-├── tests/
-│   ├── test_agent.py           # Agent unit tests
-│   ├── test_tools.py           # Tool integration tests
-│   └── test_main.py            # CLI tests
-└── notebooks/
-    └── chatbot_demo.ipynb      # Interactive Jupyter demo
+├── main.py                      # CLI entry point (ChatbotCLI)
+├── agent.py                     # Core agent implementation (AIAgent, tool-use loop)
+├── tools.py                     # Tool definitions + execute_tool() dispatcher
+├── config.py                    # Configuration management (Config.from_env())
+└── tests/
+    └── test_agent.py            # Agent unit tests
 ```
 
 ## Key Concepts
@@ -172,14 +169,14 @@ except InvalidRequestError as e:
 ## Testing
 
 ```bash
-# Run all tests
-pytest tests/ -v
+# Run all tests (from the repo root)
+python -m pytest projects/ai_agent_chatbot/tests/ -v
 
 # Run with coverage
-pytest tests/ --cov=. --cov-report=html
+python -m pytest projects/ai_agent_chatbot/tests/ --cov=projects.ai_agent_chatbot --cov-report=html
 
-# Run specific test
-pytest tests/test_agent.py::TestAgent::test_basic_conversation -v
+# Run one test class
+python -m pytest projects/ai_agent_chatbot/tests/test_agent.py::TestAgentChat -v
 ```
 
 ## Troubleshooting
@@ -188,7 +185,7 @@ pytest tests/test_agent.py::TestAgent::test_basic_conversation -v
 - Solution: Check `.env` file and API key is valid at https://console.anthropic.com
 
 **Issue**: "Module 'anthropic' not found"
-- Solution: Install dependencies: `pip install -r requirements.txt`
+- Solution: Install dependencies: `pip install -r projects/ai_agent_chatbot/requirements.txt`
 
 **Issue**: "Tool not found" error
 - Solution: Ensure tool is defined in `tools.py` and registered in agent

@@ -11,9 +11,10 @@ License: MIT
 """
 
 import logging
-import pandas as pd
-from typing import Optional, List
 from pathlib import Path
+from typing import List, Optional
+
+import pandas as pd
 
 logger = logging.getLogger(__name__)
 
@@ -30,11 +31,7 @@ class CSVExtractor(Extractor):
     """Extract data from CSV files."""
 
     def extract(
-        self,
-        source: str,
-        encoding: str = "utf-8",
-        dtype: Optional[dict] = None,
-        **kwargs
+        self, source: str, encoding: str = "utf-8", dtype: Optional[dict] = None, **kwargs
     ) -> pd.DataFrame:
         """
         Read CSV file.
@@ -69,12 +66,7 @@ class CSVExtractor(Extractor):
 class JSONExtractor(Extractor):
     """Extract data from JSON files."""
 
-    def extract(
-        self,
-        source: str,
-        lines: bool = False,
-        **kwargs
-    ) -> pd.DataFrame:
+    def extract(self, source: str, lines: bool = False, **kwargs) -> pd.DataFrame:
         """
         Read JSON file.
 
@@ -107,13 +99,7 @@ class JSONExtractor(Extractor):
 class SQLExtractor(Extractor):
     """Extract data from SQL databases."""
 
-    def extract(
-        self,
-        source: str,
-        query: str,
-        connection=None,
-        **kwargs
-    ) -> pd.DataFrame:
+    def extract(self, source: str, query: str, connection=None, **kwargs) -> pd.DataFrame:
         """
         Read data from database.
 
@@ -153,11 +139,7 @@ class MultiSourceExtractor:
             "sql": SQLExtractor(),
         }
 
-    def extract_from_sources(
-        self,
-        sources: List[dict],
-        combine: str = "concat"
-    ) -> pd.DataFrame:
+    def extract_from_sources(self, sources: List[dict], combine: str = "concat") -> pd.DataFrame:
         """
         Extract from multiple sources.
 

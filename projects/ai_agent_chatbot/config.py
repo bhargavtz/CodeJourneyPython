@@ -54,7 +54,8 @@ class Config:
             temperature=float(os.getenv("AI_TEMPERATURE", "0.7")),
             timeout=int(os.getenv("AI_TIMEOUT", "30")),
             debug_mode=os.getenv("DEBUG", "").lower() in ("true", "1", "yes"),
-            save_conversations=os.getenv("SAVE_CONVERSATIONS", "true").lower() in ("true", "1", "yes"),
+            save_conversations=os.getenv("SAVE_CONVERSATIONS", "true").lower()
+            in ("true", "1", "yes"),
         )
 
     def validate(self) -> bool:

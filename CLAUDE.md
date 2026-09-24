@@ -19,6 +19,7 @@ pip install -r requirements-dev.txt          # core dev tooling (pytest, black, 
 pip install -r requirements-ml.txt            # only if touching ML projects/libraries
 pip install -r requirements-agents.txt        # only if touching ai_agent_chatbot
 pip install -r requirements-web.txt           # only if touching a web project
+pip install -r projects/ai_agents/requirements.txt   # only if touching projects/ai_agents
 pre-commit install
 ```
 
@@ -50,8 +51,15 @@ mypy.
 - `projects/<name>/` — one folder per project, each independently runnable (`main.py` or
   equivalent entry point) with its own `README.md`, `requirements.txt`, and `tests/` package.
   Existing projects: `guess_the_number` (CLI basics), `ai_agent_chatbot` (LLM agent + tool use),
-  `data_pipeline_etl` (ETL pipeline). Note: CONTRIBUTING.md references `ml_recommendation` and
-  `web_api_service` as planned/example projects — they do not exist yet in `projects/`.
+  `data_pipeline_etl` (ETL pipeline), `ai_agents` (six educational agent/workflow
+  implementations — fixed workflows, tool use, ReAct reasoning, multi-agent teams,
+  memory/RAG, planning). `ai_agents` is a deliberate exception to "each subfolder has its
+  own README": all six sub-modules (`agent0_workflows` .. `agent5_planner_executor`) are
+  documented as sections of the single `projects/ai_agents/README.md` instead of one
+  README per sub-module — keep it that way; add a new section there rather than a new
+  per-folder README when extending this module. Note: CONTRIBUTING.md references
+  `ml_recommendation` and `web_api_service` as planned/example projects — they do not
+  exist yet in `projects/`.
 - `projects/utils/` — the only code shared across projects: `config.py` (env-var/`.env`-backed
   `Config` class), `errors.py` (exception hierarchy), `logging_config.py` (`setup_logger`/
   `get_logger` with rotating file handlers). New projects are expected to reuse these rather than
@@ -81,6 +89,15 @@ mypy.
   `docstring-convention = google` setting.
 - **Tests**: colocated under `projects/<name>/tests/test_<module>.py`, class-based
   (`TestXxx`/`test_xxx`), using pytest fixtures for setup.
+- **Imports**: every project uses absolute imports rooted at `projects.` (e.g.
+  `from projects.ai_agents.agent1_web_search.agent import WebSearchAgent`), never flat/
+  package-relative imports (`from agent import AIAgent`) — the latter only resolves when a
+  project's own directory happens to be on `sys.path` (e.g. `cd`'d into it), which breaks
+  `python -m pytest projects/ -v` run from the repo root. `ai_agent_chatbot` and
+  `data_pipeline_etl` originally used the flat style and both had their imports fixed for
+  this reason; `pytest projects/` is fully green as of the last verification (152 tests).
+  Always write **new** code the `projects.`-rooted way, and re-verify `pytest projects/ -v`
+  after touching imports in any project rather than assuming it's still green.
 
 ### Adding a new project
 Follow the structure in CONTRIBUTING.md: `projects/<name>/{__init__.py, main.py, module.py,

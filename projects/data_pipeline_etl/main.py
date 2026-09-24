@@ -2,42 +2,40 @@
 """
 Data Pipeline ETL Main Entry Point.
 
-Run this script to execute the complete ETL pipeline.
+Run this module to execute the complete ETL pipeline. Run from the
+repository root so the ``projects`` package resolves:
 
 Usage:
-    python main.py                  # Run full pipeline
-    python main.py --extract        # Extract only
-    python main.py --transform      # Transform only
-    python main.py --load           # Load only
-    python main.py --debug          # Debug logging
+    python -m projects.data_pipeline_etl.main                  # Run full pipeline
+    python -m projects.data_pipeline_etl.main --extract        # Extract only
+    python -m projects.data_pipeline_etl.main --transform      # Transform only
+    python -m projects.data_pipeline_etl.main --load           # Load only
+    python -m projects.data_pipeline_etl.main --debug          # Debug logging
 
 Author: CodeJourney Data Project
 License: MIT
 """
 
-import os
-import sys
-import logging
 import argparse
+import logging
+import sys
 from pathlib import Path
 
 import pandas as pd
 
-from pipeline import Pipeline
-from extractors import CSVExtractor, MultiSourceExtractor
-from transformers import (
+from projects.data_pipeline_etl.extractors import MultiSourceExtractor
+from projects.data_pipeline_etl.loaders import MultiTargetLoader
+from projects.data_pipeline_etl.pipeline import Pipeline
+from projects.data_pipeline_etl.transformers import (
     DeduplicationTransformer,
     MissingValueTransformer,
-    TypeConversionTransformer,
     NormalizationTransformer,
+    TypeConversionTransformer,
 )
-from loaders import CSVLoader, SQLiteLoader, MultiTargetLoader
-
 
 # Setup logging
 logging.basicConfig(
-    level=logging.INFO,
-    format="[%(levelname)s] %(asctime)s - %(name)s: %(message)s"
+    level=logging.INFO, format="[%(levelname)s] %(asctime)s - %(name)s: %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -64,13 +62,21 @@ class SamplePipeline(Pipeline):
         if not sources:
             logger.warning("No sources configured. Using sample data.")
             # Create sample data
-            return pd.DataFrame({
-                "id": [1, 2, 3, 4, 5],
-                "name": ["Alice", "Bob", "Charlie", "Alice", "Eve"],
-                "age": [30, 25, 35, 30, 28],
-                "email": ["alice@example.com", "bob@example.com", None, "alice@example.com", "eve@example.com"],
-                "score": [85.5, 90.0, 75.5, 85.5, 92.0]
-            })
+            return pd.DataFrame(
+                {
+                    "id": [1, 2, 3, 4, 5],
+                    "name": ["Alice", "Bob", "Charlie", "Alice", "Eve"],
+                    "age": [30, 25, 35, 30, 28],
+                    "email": [
+                        "alice@example.com",
+                        "bob@example.com",
+                        None,
+                        "alice@example.com",
+                        "eve@example.com",
+                    ],
+                    "score": [85.5, 90.0, 75.5, 85.5, 92.0],
+                }
+            )
 
         return self.extractor.extract_from_sources(sources)
 
@@ -103,10 +109,7 @@ class SamplePipeline(Pipeline):
 
         if not targets:
             logger.info("No targets configured. Using default CSV output.")
-            targets = [{
-                "type": "csv",
-                "path": "data/processed/output.csv"
-            }]
+            targets = [{"type": "csv", "path": "data/processed/output.csv"}]
 
         self.loader.load_to_targets(df, targets)
 
@@ -117,39 +120,40 @@ def create_sample_data():
     data_dir.mkdir(parents=True, exist_ok=True)
 
     # Create sample CSV
-    sample_df = pd.DataFrame({
-        "id": [1, 2, 3, 4, 5, 6, 7, 8],
-        "name": ["Alice", "Bob", "Charlie", "David", "Eve", "Frank", "Grace", "Henry"],
-        "age": [30, 25, 35, 28, 28, 42, 31, 29],
-        "email": ["alice@example.com", "bob@example.com", None, "david@example.com",
-                  "eve@example.com", "frank@example.com", "grace@example.com", "henry@example.com"],
-        "department": ["Sales", "IT", "HR", "Sales", "IT", "Finance", "HR", "Finance"],
-        "salary": [50000, 60000, 45000, 55000, 62000, 75000, 48000, 58000]
-    })
+    sample_df = pd.DataFrame(
+        {
+            "id": [1, 2, 3, 4, 5, 6, 7, 8],
+            "name": ["Alice", "Bob", "Charlie", "David", "Eve", "Frank", "Grace", "Henry"],
+            "age": [30, 25, 35, 28, 28, 42, 31, 29],
+            "email": [
+                "alice@example.com",
+                "bob@example.com",
+                None,
+                "david@example.com",
+                "eve@example.com",
+                "frank@example.com",
+                "grace@example.com",
+                "henry@example.com",
+            ],
+            "department": ["Sales", "IT", "HR", "Sales", "IT", "Finance", "HR", "Finance"],
+            "salary": [50000, 60000, 45000, 55000, 62000, 75000, 48000, 58000],
+        }
+    )
 
     csv_path = data_dir / "employees.csv"
     sample_df.to_csv(csv_path, index=False)
     logger.info(f"Created sample CSV: {csv_path}")
 
     return {
-        "sources": [
-            {
-                "type": "csv",
-                "path": str(csv_path),
-                "options": {}
-            }
-        ],
+        "sources": [{"type": "csv", "path": str(csv_path), "options": {}}],
         "targets": [
-            {
-                "type": "csv",
-                "path": "data/processed/output.csv"
-            },
+            {"type": "csv", "path": "data/processed/output.csv"},
             {
                 "type": "sqlite",
                 "path": "data/sql/pipeline.db",
-                "options": {"table_name": "employees", "if_exists": "replace"}
-            }
-        ]
+                "options": {"table_name": "employees", "if_exists": "replace"},
+            },
+        ],
     }
 
 
@@ -160,34 +164,18 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  python main.py                    # Run full pipeline
-  python main.py --extract          # Extract only
-  python main.py --transform        # Transform only
-  python main.py --load             # Load only
-  python main.py --debug            # Run with debug logging
-        """
+  python -m projects.data_pipeline_etl.main                    # Run full pipeline
+  python -m projects.data_pipeline_etl.main --extract          # Extract only
+  python -m projects.data_pipeline_etl.main --transform        # Transform only
+  python -m projects.data_pipeline_etl.main --load             # Load only
+  python -m projects.data_pipeline_etl.main --debug            # Run with debug logging
+        """,
     )
 
-    parser.add_argument(
-        "--extract",
-        action="store_true",
-        help="Run extract stage only"
-    )
-    parser.add_argument(
-        "--transform",
-        action="store_true",
-        help="Run transform stage only"
-    )
-    parser.add_argument(
-        "--load",
-        action="store_true",
-        help="Run load stage only"
-    )
-    parser.add_argument(
-        "--debug",
-        action="store_true",
-        help="Enable debug logging"
-    )
+    parser.add_argument("--extract", action="store_true", help="Run extract stage only")
+    parser.add_argument("--transform", action="store_true", help="Run transform stage only")
+    parser.add_argument("--load", action="store_true", help="Run load stage only")
+    parser.add_argument("--debug", action="store_true", help="Enable debug logging")
 
     args = parser.parse_args()
 
@@ -219,7 +207,7 @@ Examples:
         # Print status
         status = pipeline.get_status()
         logger.info(f"Pipeline Status: {status['status']}")
-        logger.info(f"Success Rate: {status['success']}")
+        logger.info(f"Success: {status['success']}")
 
         sys.exit(0 if success else 1)
 

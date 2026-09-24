@@ -10,9 +10,10 @@ License: MIT
 
 import logging
 import time
-from typing import Optional, List, Dict, Any, Callable
 from dataclasses import dataclass, field
 from enum import Enum
+from typing import Any, Callable, Dict, List, Optional
+
 import pandas as pd
 
 logger = logging.getLogger(__name__)
@@ -20,6 +21,7 @@ logger = logging.getLogger(__name__)
 
 class PipelineStatus(Enum):
     """Pipeline execution status."""
+
     PENDING = "pending"
     RUNNING = "running"
     SUCCESS = "success"
@@ -30,6 +32,7 @@ class PipelineStatus(Enum):
 @dataclass
 class PipelineStatistics:
     """Statistics about pipeline execution."""
+
     start_time: float = 0.0
     end_time: float = 0.0
     rows_extracted: int = 0

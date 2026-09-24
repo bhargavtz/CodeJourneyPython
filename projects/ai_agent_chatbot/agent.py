@@ -11,18 +11,22 @@ Author: CodeJourney AI Project
 License: MIT
 """
 
-import logging
 import json
-from typing import Optional, List, Dict, Any
+import logging
 from dataclasses import dataclass, field
+from typing import Any, Callable, Dict, List, Optional
+
 from anthropic import Anthropic, APIError, RateLimitError
 
 logger = logging.getLogger(__name__)
+
+MAX_TOOL_ROUNDS = 5
 
 
 @dataclass
 class Message:
     """Represents a single conversation message."""
+
     role: str  # "user" or "assistant"
     content: str
     tokens: int = 0
@@ -35,6 +39,7 @@ class Message:
 @dataclass
 class ToolUse:
     """Represents a tool use request from the model."""
+
     name: str
     input: Dict[str, Any]
     id: str = ""
@@ -43,6 +48,7 @@ class ToolUse:
 @dataclass
 class ConversationState:
     """Manages conversation state and statistics."""
+
     messages: List[Message] = field(default_factory=list)
     total_tokens: int = 0
     tool_uses: int = 0
@@ -115,6 +121,7 @@ class AIAgent:
         self.system_prompt = system_prompt or self._get_default_system_prompt()
         self.state = ConversationState()
         self.tools: List[Dict[str, Any]] = []
+        self.tool_executor: Optional[Callable[..., str]] = None
 
         logger.info(f"Initialized AI Agent with model: {model}")
 
@@ -127,14 +134,23 @@ class AIAgent:
             "your capabilities and limitations."
         )
 
-    def register_tools(self, tools: List[Dict[str, Any]]) -> None:
+    def register_tools(
+        self,
+        tools: List[Dict[str, Any]],
+        executor: Optional[Callable[..., str]] = None,
+    ) -> None:
         """
         Register available tools.
 
         Args:
             tools: List of tool definitions in Claude API format
+            executor: Callable that runs a tool by name, e.g.
+                ``executor(tool_name, **tool_input) -> str``. Required for the
+                agent to actually execute a tool the model asks for; without
+                it, tool_use requests are reported back to the model as errors.
         """
         self.tools = tools
+        self.tool_executor = executor
         logger.info(f"Registered {len(tools)} tools")
 
     def chat(self, user_message: str) -> str:
@@ -158,11 +174,7 @@ class AIAgent:
         self.state.add_message("user", user_message)
 
         try:
-            # Get response from Claude
-            response = self._call_claude()
-
-            # Process response (handle tool use if needed)
-            final_response = self._process_response(response)
+            final_response = self._run_tool_loop()
 
             # Add assistant response to history
             self.state.add_message("assistant", final_response)
@@ -188,16 +200,79 @@ class AIAgent:
             logger.error(f"Unexpected error: {e}")
             return error_msg
 
-    def _call_claude(self) -> Any:
+    def _run_tool_loop(self) -> str:
         """
-        Call Claude API with current conversation history.
+        Call Claude, executing any tools it requests, until it answers directly.
+
+        Starts from the persisted conversation history and extends it with a
+        transient sequence of assistant/tool_result turns local to this call
+        (the flat, plain-text ``ConversationState`` only ever records the
+        final answer, matching what a chat UI would actually display).
+
+        Returns:
+            The agent's final response text.
+        """
+        messages: List[Dict[str, Any]] = self.state.get_history()
+
+        for _ in range(MAX_TOOL_ROUNDS):
+            response = self._call_claude(messages)
+
+            text_parts: List[str] = []
+            tool_use_blocks: List[Any] = []
+            for block in response.content:
+                if getattr(block, "type", None) == "tool_use":
+                    tool_use_blocks.append(block)
+                else:
+                    text_parts.append(getattr(block, "text", ""))
+
+            if not tool_use_blocks:
+                return "".join(text_parts) or "I couldn't generate a response. Please try again."
+
+            messages.append({"role": "assistant", "content": response.content})
+
+            tool_results = []
+            for block in tool_use_blocks:
+                self.state.tool_uses += 1
+                result = self._execute_tool(block)
+                tool_results.append(
+                    {"type": "tool_result", "tool_use_id": block.id, "content": result}
+                )
+            messages.append({"role": "user", "content": tool_results})
+
+        return "I wasn't able to finish using tools to answer that. Please try rephrasing."
+
+    def _execute_tool(self, block: Any) -> str:
+        """
+        Run a single tool_use block via the registered executor.
+
+        Args:
+            block: A tool_use content block from a Claude response.
+
+        Returns:
+            The tool's result as a string, or a descriptive error message.
+        """
+        logger.debug(f"Tool use detected: {block.name}")
+
+        if self.tool_executor is None:
+            return f"Error: no tool executor registered for '{block.name}'"
+
+        try:
+            return str(self.tool_executor(block.name, **block.input))
+        except Exception as e:
+            logger.error(f"Tool execution failed for {block.name}: {e}")
+            return f"Error executing tool '{block.name}': {e}"
+
+    def _call_claude(self, messages: List[Dict[str, Any]]) -> Any:
+        """
+        Call Claude API with the given message history.
+
+        Args:
+            messages: Conversation history in API format.
 
         Returns:
             API response object
         """
-        messages = self.state.get_history()
-
-        request_kwargs = {
+        request_kwargs: Dict[str, Any] = {
             "model": self.model,
             "max_tokens": self.max_tokens,
             "system": self.system_prompt,
@@ -210,36 +285,6 @@ class AIAgent:
 
         logger.debug(f"Calling Claude API with {len(messages)} messages")
         return self.client.messages.create(**request_kwargs)
-
-    def _process_response(self, response: Any) -> str:
-        """
-        Process Claude's response, handling tool use if needed.
-
-        Args:
-            response: Claude API response
-
-        Returns:
-            Final response text
-        """
-        # Extract text content
-        result_text = ""
-        has_tool_use = False
-
-        for block in response.content:
-            if hasattr(block, "text"):
-                result_text += block.text
-            elif hasattr(block, "type") and block.type == "tool_use":
-                has_tool_use = True
-                logger.debug(f"Tool use detected: {block.name}")
-
-        # If there was tool use, add full response to history and handle tools
-        if has_tool_use:
-            # Add full response (including tool_use blocks) to history
-            full_response = response
-            # Note: In production, you'd handle tool execution here
-            # For now, just return the text response
-
-        return result_text or "I couldn't generate a response. Please try again."
 
     def clear_conversation(self) -> None:
         """Clear conversation history and reset state."""
@@ -288,7 +333,7 @@ class AIAgent:
                 "total_messages": len(self.state.messages),
                 "total_tokens": self.state.total_tokens,
                 "errors": self.state.errors,
-            }
+            },
         }
 
         try:

@@ -4,7 +4,7 @@ Welcome to **CodeJourneyPython**! Embark on an exciting adventure through the wo
 
 ![Python Version](https://img.shields.io/badge/python-3.7%2B-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
-![Last Updated](https://img.shields.io/badge/last%20updated-December%202024-brightgreen)
+![Last Updated](https://img.shields.io/badge/last%20updated-September%202026-brightgreen)
 ![Contributions Welcome](https://img.shields.io/badge/contributions-welcome-orange)
 
 ---
@@ -44,6 +44,7 @@ Chart your progress with these Python projects that grow in complexity as you ad
 3. **Mountain Peak**: Build a web application using a Python framework like Flask or Django.
 4. **Skyline Explorer**: Develop a machine learning model to predict or classify data.
 5. **Final Frontier**: Contribute to an open-source Python project or create a complex application of your choice.
+6. **AI Agents Crash Course**: Six small, from-scratch implementations of the core patterns behind AI agents and LLM workflows — fixed workflows, tool use, ReAct reasoning, multi-agent teams, memory/RAG, and planning. See [`projects/ai_agents/`](./projects/ai_agents).
 
 [Explore all milestones](./projects)
 
@@ -78,7 +79,7 @@ Equip yourself with these essential Python resources:
 
 - [Python Survival Guides (Cheatsheets)](./resources/cheatsheets): Quick reference guides for Python syntax, data structures, OOP, and more.
 - [Map of the Python Ecosystem (Useful Links)](./resources/README.md): Curated links to official documentation, community forums, and other valuable resources.
-- [Virtual Tools: Mastering Your Python Environment](./resources/Virtual%20tools/README.md): Learn to set up virtual environments and use tools like `pip` and `conda` to manage your Python packages.
+- [Virtual Tools: Mastering Your Python Environment](./resources/virtual_tools/README.md): Learn to set up virtual environments and use tools like `pip` and `conda` to manage your Python packages.
 - **Python Libraries Overview**: Explore popular libraries like NumPy, Pandas, TensorFlow, Keras, and more.
  
 ---

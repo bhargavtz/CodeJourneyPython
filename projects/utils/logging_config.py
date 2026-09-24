@@ -47,9 +47,7 @@ def setup_logger(
 
     # Default format
     if log_format is None:
-        log_format = (
-            "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-        )
+        log_format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 
     formatter = logging.Formatter(log_format)
 

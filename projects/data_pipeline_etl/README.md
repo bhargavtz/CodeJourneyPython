@@ -36,54 +36,65 @@ By completing this project, you'll understand:
 
 ### 1. Setup
 
+Run everything from the **repository root** (not from inside this folder), so the
+`projects` package resolves — see `CLAUDE.md` for why.
+
 ```bash
 # Create virtual environment
 python3 -m venv venv
 source venv/bin/activate
 
 # Install dependencies
-pip install -r requirements.txt
-
-# Prepare sample data
-python setup_sample_data.py
+pip install -r projects/data_pipeline_etl/requirements.txt
 ```
+
+There's no separate sample-data script to run first: `main.py` generates a small sample
+`employees.csv` under `data/raw/` itself on every run if one doesn't already exist.
 
 ### 2. Run the Pipeline
 
 ```bash
 # Run full pipeline
-python main.py
+python -m projects.data_pipeline_etl.main
 
 # Run with verbose logging
-DEBUG=1 python main.py
+python -m projects.data_pipeline_etl.main --debug
 
 # Run specific stage
-python main.py --extract
-python main.py --transform
-python main.py --load
+python -m projects.data_pipeline_etl.main --extract
+python -m projects.data_pipeline_etl.main --transform
+python -m projects.data_pipeline_etl.main --load
 
 # Run tests
-pytest tests/ -v
+python -m pytest projects/data_pipeline_etl/tests/ -v
 ```
 
 ### 3. Example Output
 
 ```
-$ python main.py
+$ python -m projects.data_pipeline_etl.main
 
-[INFO] Starting ETL Pipeline
+[INFO] Initializing Data Pipeline...
 [INFO] Stage: EXTRACT
-[INFO] Extracted 10,000 rows from customers.csv
-[INFO] Extracted 5,423 rows from orders.json
+[INFO] Extracted 8 rows
 [INFO] Stage: TRANSFORM
-[INFO] Validating customer data...
-[INFO] Found 42 invalid emails - flagging for review
-[INFO] Enriching customer data with geography...
+[INFO] Removed 1 duplicate rows
+[INFO] Converted age to int64
 [INFO] Stage: LOAD
-[INFO] Loading 15,381 rows to SQLite
+[INFO] Loaded 8 rows to CSV: data/processed/output.csv
+[INFO] Loaded 8 rows to SQLite: data/sql/pipeline.db/employees
 [INFO] Pipeline completed successfully
-[INFO] Summary: Processed 15,381 rows in 3.2 seconds
+
+Pipeline Execution Summary:
+  Status: SUCCESS
+  Rows Extracted: 8
+  Rows Transformed: 8
+  Rows Loaded: 8
+  Success Rate: 100.0%
 ```
+
+`data/` is created next to wherever you run the command from and is gitignored — delete
+it any time and the pipeline will regenerate its sample input on the next run.
 
 ## Project Structure
 
@@ -91,25 +102,16 @@ $ python main.py
 projects/data_pipeline_etl/
 ├── README.md                    # This file
 ├── requirements.txt             # Project dependencies
-├── main.py                      # Pipeline entry point
-├── pipeline.py                  # Core pipeline logic
-├── extractors.py               # Data extraction modules
-├── transformers.py             # Data transformation logic
-├── loaders.py                  # Data loading modules
-├── validators.py               # Data validation rules
-├── config.py                   # Configuration management
-├── setup_sample_data.py        # Generate sample datasets
-├── data/
-│   ├── raw/                    # Input data (raw)
-│   ├── processed/              # Output data (processed)
-│   └── sql/                    # Database files
-├── tests/
-│   ├── test_pipeline.py        # Pipeline tests
-│   ├── test_extractors.py      # Extractor tests
-│   ├── test_transformers.py    # Transformer tests
-│   └── test_loaders.py         # Loader tests
-└── notebooks/
-    └── etl_walkthrough.ipynb   # Interactive tutorial
+├── main.py                      # Pipeline entry point + SamplePipeline example
+├── pipeline.py                  # Core Pipeline base class (extract/transform/load + stats)
+├── extractors.py                # Data extraction modules (CSV, JSON, SQL, multi-source)
+├── transformers.py              # Data transformation logic (dedupe, missing values, types, ...)
+├── loaders.py                   # Data loading modules (CSV, SQLite, JSON, multi-target)
+└── tests/
+    ├── test_pipeline.py         # Pipeline base-class tests
+    ├── test_extractors.py       # Extractor tests
+    ├── test_transformers.py     # Transformer tests
+    └── test_loaders.py          # Loader tests
 ```
 
 ## Key Concepts
@@ -172,15 +174,15 @@ finally:
 ```
 
 ### 5. **Configuration**
-Manage pipeline settings:
+`SamplePipeline` (in `main.py`) takes a plain config dict naming its sources and targets —
+see `create_sample_data()` for the shape it expects:
 ```python
-# config.py
 config = {
-    "extractors": ["customers.csv", "orders.json"],
-    "transformers": ["deduplicate", "validate_emails"],
-    "loaders": ["sqlite", "csv"],
-    "batch_size": 1000,
-    "error_handling": "skip_invalid_rows"
+    "sources": [{"type": "csv", "path": "data/raw/employees.csv", "options": {}}],
+    "targets": [
+        {"type": "csv", "path": "data/processed/output.csv"},
+        {"type": "sqlite", "path": "data/sql/pipeline.db", "options": {"table_name": "employees"}},
+    ],
 }
 ```
 
@@ -197,23 +199,22 @@ config = {
 ## Testing
 
 ```bash
-# Run all tests
-pytest tests/ -v
+# Run all tests (from the repo root)
+python -m pytest projects/data_pipeline_etl/tests/ -v
 
 # Run with coverage
-pytest tests/ --cov=. --cov-report=html
+python -m pytest projects/data_pipeline_etl/tests/ --cov=projects.data_pipeline_etl --cov-report=html
 
-# Run specific test
-pytest tests/test_pipeline.py::TestExtract::test_read_csv -v
-
-# Run with markers
-pytest -m "not slow" tests/
+# Run one test class
+python -m pytest projects/data_pipeline_etl/tests/test_pipeline.py::TestPipelineRun -v
 ```
 
 ## Troubleshooting
 
-**Issue**: "No such file or directory: data/raw/customers.csv"
-- Solution: Run `python setup_sample_data.py` to generate sample data
+**Issue**: "No such file or directory: data/raw/employees.csv"
+- Solution: this shouldn't happen in normal use — `main.py`'s `create_sample_data()`
+  regenerates that file on every run. If you deleted `data/` mid-run, just run the
+  pipeline again.
 
 **Issue**: "sqlite3.IntegrityError: UNIQUE constraint failed"
 - Solution: Clear database first: `rm data/sql/pipeline.db`

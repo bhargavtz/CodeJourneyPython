@@ -141,9 +141,7 @@
   - A simple and elegant HTTP library for Python, used for making requests to web APIs.
 - [Beautiful Soup Documentation](https://www.crummy.com/software/BeautifulSoup/bs4/doc/)
   - A Python library for parsing HTML and XML documents, useful for web scraping.
-- [Scrapy Documentation
-
-](https://docs.scrapy.org/en/latest/)
+- [Scrapy Documentation](https://docs.scrapy.org/en/latest/)
   - An open-source and collaborative web crawling framework for Python.
 
 ## **Security**

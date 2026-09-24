@@ -13,9 +13,10 @@ License: MIT
 """
 
 import logging
-import pandas as pd
+from typing import Dict, List, Optional
+
 import numpy as np
-from typing import Optional, Dict, List
+import pandas as pd
 
 logger = logging.getLogger(__name__)
 
@@ -43,7 +44,7 @@ class DeduplicationTransformer(Transformer):
             DataFrame with duplicates removed
         """
         initial_rows = len(df)
-        df = df.drop_duplicates(subset=subset, keep='first')
+        df = df.drop_duplicates(subset=subset, keep="first")
         removed = initial_rows - len(df)
 
         if removed > 0:
@@ -56,10 +57,7 @@ class MissingValueTransformer(Transformer):
     """Handle missing values."""
 
     def transform(
-        self,
-        df: pd.DataFrame,
-        strategy: str = "mean",
-        fill_value: Optional[str] = None
+        self, df: pd.DataFrame, strategy: str = "mean", fill_value: Optional[str] = None
     ) -> pd.DataFrame:
         """
         Handle missing values.
@@ -80,7 +78,7 @@ class MissingValueTransformer(Transformer):
             numeric_cols = df.select_dtypes(include=[np.number]).columns
             df[numeric_cols] = df[numeric_cols].fillna(df[numeric_cols].mean())
         elif strategy == "forward_fill":
-            df = df.fillna(method="ffill")
+            df = df.ffill()
         elif strategy == "value":
             if fill_value is None:
                 raise ValueError("fill_value required for strategy='value'")
@@ -133,12 +131,16 @@ class ValidationTransformer(Transformer):
         """
         Validate data and flag invalid rows.
 
+        Adds a ``<column>_valid`` boolean column for each validated column,
+        so downstream steps (or a human) can filter on or inspect exactly
+        which rows failed which rule.
+
         Args:
             df: Input DataFrame
             rules: Dict of {column: validation_function}
 
         Returns:
-            DataFrame with validation flags
+            DataFrame with a ``<column>_valid`` flag column per validated column
         """
         invalid_count = 0
 
@@ -149,6 +151,7 @@ class ValidationTransformer(Transformer):
 
             # Apply validation rule
             mask = df[column].apply(rule)
+            df[f"{column}_valid"] = mask
             invalid = (~mask).sum()
 
             if invalid > 0:

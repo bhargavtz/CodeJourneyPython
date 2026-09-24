@@ -25,13 +25,9 @@ Learning Objectives:
 
 import logging
 import random
-from typing import Optional
 
 # Configure logging for the game
-logging.basicConfig(
-    level=logging.INFO,
-    format="[%(levelname)s] %(message)s"
-)
+logging.basicConfig(level=logging.INFO, format="[%(levelname)s] %(message)s")
 logger = logging.getLogger(__name__)
 
 
@@ -95,9 +91,7 @@ def guess_the_number() -> None:
                         f"Out of range guess: {user_guess} "
                         f"(valid range: {MIN_NUMBER}-{MAX_NUMBER})"
                     )
-                    print(
-                        f"Please guess a number between {MIN_NUMBER} and {MAX_NUMBER}."
-                    )
+                    print(f"Please guess a number between {MIN_NUMBER} and {MAX_NUMBER}.")
                     continue
 
                 logger.debug(f"Attempt {attempts}: User guessed {user_guess}")

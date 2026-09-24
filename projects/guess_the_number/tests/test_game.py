@@ -9,15 +9,16 @@ Tests cover:
     - Game logic and feedback
 """
 
-import pytest
-from unittest.mock import patch, MagicMock
-from io import StringIO
 import sys
+from io import StringIO
+from unittest.mock import patch
+
+import pytest
 
 from projects.guess_the_number.game import (
-    guess_the_number,
-    InvalidGuessError,
     GameError,
+    InvalidGuessError,
+    guess_the_number,
 )
 
 

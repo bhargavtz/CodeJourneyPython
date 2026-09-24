@@ -2,6 +2,13 @@
 
 **Status**: 🚀 **Phases 1-2 Complete** | **Ready for Phase 3 (AI/ML Projects)**
 
+> **Update**: this document is a point-in-time snapshot written when Phases 1-2 were
+> finished and Phase 3 was still a plan. Since then, Phase 3 Tier 1 (the AI Agent Chatbot
+> and Data Pipeline ETL projects described below) has actually been built, and a sixth
+> project — `projects/ai_agents/`, six small agent/workflow implementations — was added
+> on top of it. The plan sections below are kept as-written for historical context; see
+> the "Roadmap Progress" section for the corrected, current status.
+
 ---
 
 ## Overview
@@ -328,7 +335,9 @@ projects/data_pipeline_etl/
 - ✅ Phase 0: Architecture Planning (COMPLETE)
 - ✅ Phase 1: Professional Standards (COMPLETE)
 - ✅ Phase 2: Utilities & Guidelines (COMPLETE)
-- 🔜 Phase 3 Tier 1: AI Agent + Data Pipeline
+- ✅ Phase 3 Tier 1: AI Agent Chatbot + Data Pipeline ETL (COMPLETE)
+- ✅ Bonus: `projects/ai_agents/` — 6 additional agent/workflow patterns (COMPLETE, not
+  originally in this plan)
 - 🔜 Phase 3 Tier 2: ML + Full-stack
 - 🔜 Phase 4: CI/CD & Deployment
 - 🔜 Phase 5: Library Tutorials
@@ -362,8 +371,8 @@ This project now provides:
 ## 🚀 Next Steps
 
 ### Immediate (Week 3-4)
-1. **Start Phase 3 Tier 1**: Implement AI Agent Chatbot
-2. **Start Phase 3 Tier 1**: Implement Data Pipeline ETL
+1. ~~**Start Phase 3 Tier 1**: Implement AI Agent Chatbot~~ — done (see the Update note above)
+2. ~~**Start Phase 3 Tier 1**: Implement Data Pipeline ETL~~ — done (see the Update note above)
 3. **Gather feedback**: Review and iterate on Phase 1-2 improvements
 
 ### Short-term (Week 5-6)

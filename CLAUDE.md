@@ -89,17 +89,15 @@ mypy.
   `docstring-convention = google` setting.
 - **Tests**: colocated under `projects/<name>/tests/test_<module>.py`, class-based
   (`TestXxx`/`test_xxx`), using pytest fixtures for setup.
-- **Imports — two conventions coexist, only one actually works from the repo root**:
-  `guess_the_number` and `ai_agents` use absolute imports rooted at `projects.` (e.g.
-  `from projects.ai_agents.agent1_web_search.agent import WebSearchAgent`), which is what
-  makes `python -m pytest projects/ -v` succeed. `ai_agent_chatbot` instead uses flat,
-  package-relative imports (`from agent import AIAgent`) that only resolve when run with
-  that project's own directory on `sys.path` (e.g. `cd`'d into it) — running the documented
-  `pytest projects/` from the repo root currently fails to collect
-  `ai_agent_chatbot/tests/test_agent.py` with `ModuleNotFoundError: No module named 'agent'`.
-  This is a pre-existing inconsistency, not a regression to "fix" reflexively — but always
-  write **new** code using the `projects.`-rooted absolute-import style, and don't assume
-  `pytest projects/` is fully green until you've checked.
+- **Imports**: every project uses absolute imports rooted at `projects.` (e.g.
+  `from projects.ai_agents.agent1_web_search.agent import WebSearchAgent`), never flat/
+  package-relative imports (`from agent import AIAgent`) — the latter only resolves when a
+  project's own directory happens to be on `sys.path` (e.g. `cd`'d into it), which breaks
+  `python -m pytest projects/ -v` run from the repo root. `ai_agent_chatbot` and
+  `data_pipeline_etl` originally used the flat style and both had their imports fixed for
+  this reason; `pytest projects/` is fully green as of the last verification (152 tests).
+  Always write **new** code the `projects.`-rooted way, and re-verify `pytest projects/ -v`
+  after touching imports in any project rather than assuming it's still green.
 
 ### Adding a new project
 Follow the structure in CONTRIBUTING.md: `projects/<name>/{__init__.py, main.py, module.py,

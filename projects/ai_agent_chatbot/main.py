@@ -2,33 +2,30 @@
 """
 AI Agent Chatbot CLI - Interactive conversation interface.
 
-Run this script to start an interactive chat session with the AI agent.
+Run this module to start an interactive chat session with the AI agent.
+Run from the repository root so the ``projects`` package resolves:
 
 Usage:
-    python main.py                  # Start interactive mode
-    python main.py --help          # Show help message
-    python main.py --debug         # Run with debug logging
+    python -m projects.ai_agent_chatbot.main                  # Start interactive mode
+    python -m projects.ai_agent_chatbot.main --help           # Show help message
+    python -m projects.ai_agent_chatbot.main --debug          # Run with debug logging
 
 Author: CodeJourney AI Project
 License: MIT
 """
 
-import os
-import sys
-import logging
 import argparse
-from pathlib import Path
+import logging
+import sys
+
 from dotenv import load_dotenv
 
-from agent import AIAgent
-from tools import get_all_tools, execute_tool
-from config import Config
+from projects.ai_agent_chatbot.agent import AIAgent
+from projects.ai_agent_chatbot.config import Config
+from projects.ai_agent_chatbot.tools import execute_tool, get_all_tools
 
 # Setup logging
-logging.basicConfig(
-    level=logging.INFO,
-    format="[%(levelname)s] %(name)s: %(message)s"
-)
+logging.basicConfig(level=logging.INFO, format="[%(levelname)s] %(name)s: %(message)s")
 logger = logging.getLogger(__name__)
 
 
@@ -59,7 +56,7 @@ class ChatbotCLI:
     def print_welcome(self) -> None:
         """Print welcome message."""
         print("\n" + "=" * 60)
-        print("🤖 AI Agent Chatbot - River Crossing")
+        print("🤖 AI Agent Chatbot")
         print("=" * 60)
         print("Type 'help' for commands, 'exit' to quit\n")
 
@@ -157,32 +154,25 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  python main.py                    # Start interactive mode
-  python main.py --debug            # Run with debug logging
-  python main.py --model gpt-4      # Use different model
-        """
+  python -m projects.ai_agent_chatbot.main                             # Start interactive mode
+  python -m projects.ai_agent_chatbot.main --debug                     # Run with debug logging
+  python -m projects.ai_agent_chatbot.main --model claude-opus-4-7     # Use a different model
+        """,
     )
 
-    parser.add_argument(
-        "--debug",
-        action="store_true",
-        help="Enable debug logging"
-    )
+    parser.add_argument("--debug", action="store_true", help="Enable debug logging")
     parser.add_argument(
         "--model",
-        default="claude-opus-4-7",
-        help="Claude model to use (default: claude-opus-4-7)"
+        default=None,
+        help="Claude model to use (default: from AI_MODEL env var, or claude-opus-4-7)",
     )
     parser.add_argument(
         "--max-tokens",
         type=int,
-        default=2048,
-        help="Maximum tokens per response (default: 2048)"
+        default=None,
+        help="Maximum tokens per response (default: from AI_MAX_TOKENS env var, or 2048)",
     )
-    parser.add_argument(
-        "--system-prompt",
-        help="Custom system prompt"
-    )
+    parser.add_argument("--system-prompt", help="Custom system prompt")
 
     args = parser.parse_args()
 
@@ -191,28 +181,32 @@ Examples:
         logging.getLogger().setLevel(logging.DEBUG)
         logger.debug("Debug logging enabled")
 
-    # Load environment variables
+    # Load environment variables and configuration
     load_dotenv()
-    api_key = os.getenv("ANTHROPIC_API_KEY")
+    config = Config.from_env()
 
-    if not api_key:
+    if not config.api_key:
         print("Error: ANTHROPIC_API_KEY environment variable not set")
         print("Please create a .env file with: ANTHROPIC_API_KEY=your-key")
         sys.exit(1)
 
     try:
+        config.validate()
+
+        # CLI flags override the environment-derived configuration
+        model = args.model or config.model
+        max_tokens = args.max_tokens or config.max_tokens
+        system_prompt = args.system_prompt or config.system_prompt
+
         # Initialize agent
         logger.info("Initializing AI Agent...")
         agent = AIAgent(
-            api_key=api_key,
-            model=args.model,
-            max_tokens=args.max_tokens,
-            system_prompt=args.system_prompt
+            api_key=config.api_key, model=model, max_tokens=max_tokens, system_prompt=system_prompt
         )
 
-        # Register tools
+        # Register tools and the function that executes them
         tools = get_all_tools()
-        agent.register_tools(tools)
+        agent.register_tools(tools, executor=execute_tool)
         logger.info(f"Registered {len(tools)} tools")
 
         # Run CLI

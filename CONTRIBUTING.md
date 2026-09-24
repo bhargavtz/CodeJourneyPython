@@ -209,15 +209,14 @@ CodeJourneyPython/
 │   │   └── README.md
 │   ├── ai_agent_chatbot/       # River Crossing - AI Agents
 │   ├── data_pipeline_etl/      # Mountain Peak - Data Engineering
-│   ├── ml_recommendation/      # Skyline Explorer - ML
-│   ├── web_api_service/        # Final Frontier - Full Stack
+│   ├── ai_agents/              # AI Agents Crash Course - 6 agent/workflow patterns
+│   ├── ml_recommendation/      # Skyline Explorer - ML (planned, not yet added)
+│   ├── web_api_service/        # Final Frontier - Full Stack (planned, not yet added)
 │   └── utils/                  # Shared utilities
 ├── libraries/
 │   ├── Numpy/
-│   ├── Pandas/
-│   ├── MachineLearning/        # NEW
-│   ├── AIAgents/               # NEW
-│   └── DataVisualization/      # NEW
+│   └── Pandas/
+│       # MachineLearning/, AIAgents/, DataVisualization/ are planned, not yet added
 ├── resources/
 │   ├── cheatsheets/
 │   └── README.md

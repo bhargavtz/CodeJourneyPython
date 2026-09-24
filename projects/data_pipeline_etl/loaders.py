@@ -11,10 +11,10 @@ License: MIT
 """
 
 import logging
-import pandas as pd
 import sqlite3
 from pathlib import Path
-from typing import Optional
+
+import pandas as pd
 
 logger = logging.getLogger(__name__)
 
@@ -60,7 +60,7 @@ class SQLiteLoader(Loader):
         target: str,
         table_name: str = "data",
         if_exists: str = "replace",
-        **kwargs
+        **kwargs,
     ) -> None:
         """
         Write DataFrame to SQLite.
@@ -89,13 +89,7 @@ class SQLiteLoader(Loader):
 class JSONLoader(Loader):
     """Load data to JSON file."""
 
-    def load(
-        self,
-        df: pd.DataFrame,
-        target: str,
-        orient: str = "records",
-        **kwargs
-    ) -> None:
+    def load(self, df: pd.DataFrame, target: str, orient: str = "records", **kwargs) -> None:
         """
         Write DataFrame to JSON.
 

@@ -80,8 +80,7 @@ class InvalidGuessError(GameError):
         self.min_val = min_val
         self.max_val = max_val
         message = (
-            f"Invalid guess '{guess}'. Please enter a number between "
-            f"{min_val} and {max_val}."
+            f"Invalid guess '{guess}'. Please enter a number between " f"{min_val} and {max_val}."
         )
         super().__init__(message)
 

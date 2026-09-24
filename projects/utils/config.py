@@ -7,10 +7,10 @@ Provides:
 - Default configuration values
 """
 
-import os
-from typing import Any, Dict, Optional
-from pathlib import Path
 import json
+import os
+from pathlib import Path
+from typing import Any, Dict, Optional
 
 
 class Config:

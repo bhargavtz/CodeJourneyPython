@@ -11,8 +11,8 @@ License: MIT
 """
 
 import logging
-from typing import Dict, Any, List
 from abc import ABC, abstractmethod
+from typing import Any, Dict, List
 
 logger = logging.getLogger(__name__)
 
@@ -53,7 +53,7 @@ class CalculatorTool(Tool):
                         "type": "integer",
                         "description": "Decimal places for result (default: 2)",
                         "default": 2,
-                    }
+                    },
                 },
                 "required": ["expression"],
             },
@@ -73,16 +73,19 @@ class CalculatorTool(Tool):
         try:
             # Use eval with restricted namespace for safety
             allowed_names = {
-                "abs": abs, "round": round, "min": min, "max": max,
-                "pow": pow, "sum": sum
+                "abs": abs,
+                "round": round,
+                "min": min,
+                "max": max,
+                "pow": pow,
+                "sum": sum,
             }
             # Add common math functions
             import math
-            allowed_names.update({
-                name: getattr(math, name)
-                for name in dir(math)
-                if not name.startswith("_")
-            })
+
+            allowed_names.update(
+                {name: getattr(math, name) for name in dir(math) if not name.startswith("_")}
+            )
 
             result = eval(expression, {"__builtins__": {}}, allowed_names)
             result = round(result, precision)
@@ -120,7 +123,7 @@ class WeatherTool(Tool):
                         "enum": ["celsius", "fahrenheit"],
                         "description": "Temperature units (default: celsius)",
                         "default": "celsius",
-                    }
+                    },
                 },
                 "required": ["location"],
             },
@@ -176,7 +179,7 @@ class SearchTool(Tool):
                         "type": "integer",
                         "description": "Number of results to return (1-10, default: 3)",
                         "default": 3,
-                    }
+                    },
                 },
                 "required": ["query"],
             },

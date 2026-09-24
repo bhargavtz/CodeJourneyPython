@@ -53,9 +53,13 @@ mypy.
   Existing projects: `guess_the_number` (CLI basics), `ai_agent_chatbot` (LLM agent + tool use),
   `data_pipeline_etl` (ETL pipeline), `ai_agents` (six educational agent/workflow
   implementations — fixed workflows, tool use, ReAct reasoning, multi-agent teams,
-  memory/RAG, planning; see its own hub doc at `projects/ai_agents/README.md`). Note:
-  CONTRIBUTING.md references `ml_recommendation` and `web_api_service` as planned/example
-  projects — they do not exist yet in `projects/`.
+  memory/RAG, planning). `ai_agents` is a deliberate exception to "each subfolder has its
+  own README": all six sub-modules (`agent0_workflows` .. `agent5_planner_executor`) are
+  documented as sections of the single `projects/ai_agents/README.md` instead of one
+  README per sub-module — keep it that way; add a new section there rather than a new
+  per-folder README when extending this module. Note: CONTRIBUTING.md references
+  `ml_recommendation` and `web_api_service` as planned/example projects — they do not
+  exist yet in `projects/`.
 - `projects/utils/` — the only code shared across projects: `config.py` (env-var/`.env`-backed
   `Config` class), `errors.py` (exception hierarchy), `logging_config.py` (`setup_logger`/
   `get_logger` with rotating file handlers). New projects are expected to reuse these rather than

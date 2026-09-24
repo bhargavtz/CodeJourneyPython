@@ -51,11 +51,11 @@ mypy.
 - `projects/<name>/` — one folder per project, each independently runnable (`main.py` or
   equivalent entry point) with its own `README.md`, `requirements.txt`, and `tests/` package.
   Existing projects: `guess_the_number` (CLI basics), `ai_agent_chatbot` (LLM agent + tool use),
-  `data_pipeline_etl` (ETL pipeline), `ai_agents` (five educational agent implementations —
-  tool use, ReAct reasoning, multi-agent teams, memory/RAG, planning; see its own README and
-  `CLAUDE.md`-equivalent hub doc at `projects/ai_agents/README.md`). Note: CONTRIBUTING.md
-  references `ml_recommendation` and `web_api_service` as planned/example projects — they do
-  not exist yet in `projects/`.
+  `data_pipeline_etl` (ETL pipeline), `ai_agents` (six educational agent/workflow
+  implementations — fixed workflows, tool use, ReAct reasoning, multi-agent teams,
+  memory/RAG, planning; see its own hub doc at `projects/ai_agents/README.md`). Note:
+  CONTRIBUTING.md references `ml_recommendation` and `web_api_service` as planned/example
+  projects — they do not exist yet in `projects/`.
 - `projects/utils/` — the only code shared across projects: `config.py` (env-var/`.env`-backed
   `Config` class), `errors.py` (exception hierarchy), `logging_config.py` (`setup_logger`/
   `get_logger` with rotating file handlers). New projects are expected to reuse these rather than

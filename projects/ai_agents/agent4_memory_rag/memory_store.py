@@ -19,7 +19,7 @@ import uuid
 from collections import Counter
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 logger = logging.getLogger(__name__)
 
@@ -57,11 +57,11 @@ class Document:
     text: str
     vector: Dict[str, int] = field(repr=False)
 
-    def to_dict(self) -> Dict[str, object]:
+    def to_dict(self) -> Dict[str, Any]:
         return {"doc_id": self.doc_id, "text": self.text, "vector": self.vector}
 
     @classmethod
-    def from_dict(cls, data: Dict[str, object]) -> "Document":
+    def from_dict(cls, data: Dict[str, Any]) -> "Document":
         return cls(doc_id=data["doc_id"], text=data["text"], vector=data["vector"])
 
 
@@ -122,11 +122,13 @@ class MemoryStore:
         return scored[:top_k]
 
     def _save(self) -> None:
+        assert self._path is not None  # only called when a path is configured
         data = [doc.to_dict() for doc in self._documents.values()]
         self._path.parent.mkdir(parents=True, exist_ok=True)
         self._path.write_text(json.dumps(data, indent=2))
 
     def _load(self) -> None:
+        assert self._path is not None  # only called when self._path.exists()
         data = json.loads(self._path.read_text())
         for entry in data:
             doc = Document.from_dict(entry)

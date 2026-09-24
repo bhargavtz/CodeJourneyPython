@@ -44,7 +44,7 @@ Chart your progress with these Python projects that grow in complexity as you ad
 3. **Mountain Peak**: Build a web application using a Python framework like Flask or Django.
 4. **Skyline Explorer**: Develop a machine learning model to predict or classify data.
 5. **Final Frontier**: Contribute to an open-source Python project or create a complex application of your choice.
-6. **AI Agents Crash Course**: Five small, from-scratch implementations of the core patterns behind AI agents — tool use, ReAct reasoning, multi-agent teams, memory/RAG, and planning. See [`projects/ai_agents/`](./projects/ai_agents).
+6. **AI Agents Crash Course**: Six small, from-scratch implementations of the core patterns behind AI agents and LLM workflows — fixed workflows, tool use, ReAct reasoning, multi-agent teams, memory/RAG, and planning. See [`projects/ai_agents/`](./projects/ai_agents).
 
 [Explore all milestones](./projects)
 

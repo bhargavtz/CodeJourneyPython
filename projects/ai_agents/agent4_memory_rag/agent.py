@@ -9,13 +9,13 @@ guarantee RAG is meant to provide: answers you can trace back to a source.
 
 import logging
 import os
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
 from anthropic import Anthropic
 
 from projects.utils.errors import BaseProjectError
 
-from .memory_store import MemoryStore
+from .memory_store import Document, MemoryStore
 
 logger = logging.getLogger(__name__)
 
@@ -126,7 +126,7 @@ class MemoryAgent:
         return "".join(block.text for block in response.content if block.type == "text")
 
     @staticmethod
-    def _format_context(matches: List) -> str:
+    def _format_context(matches: List[Tuple[Document, float]]) -> str:
         """Render retrieved (Document, score) pairs as numbered context passages."""
         lines = []
         for index, (doc, score) in enumerate(matches, start=1):

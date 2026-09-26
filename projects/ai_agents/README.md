@@ -17,6 +17,21 @@ about all six lives in this one file, so there is nowhere else you need to look.
 > Agent 0 is deliberately **not** that — it's here so you see the simpler alternative
 > before you reach for a loop.
 
+---
+
+## Beginner Step 1 — Call a Model API from Scratch
+
+Start here if you have never called an AI model from code. This module shows the raw HTTP request, API key/model configuration, conversation history, JSON output, parsing, validation, and a small support-ticket classifier. It uses no agent framework.
+
+- Guide: [`model_coding_from_scratch/README.md`](./model_coding_from_scratch/README.md)
+- Runnable code: [`model_coding_from_scratch/main.py`](./model_coding_from_scratch/main.py)
+- HTTP client: [`model_coding_from_scratch/client.py`](./model_coding_from_scratch/client.py)
+- Offline tests: `python -m pytest projects/ai_agents/model_coding_from_scratch/tests/ -v`
+
+From the repository root, use [`model_coding_from_scratch/.env.example`](./model_coding_from_scratch/.env.example) to configure `.env`. Defaults use Router.bynara.id and `gpt-6-luna`; choose any compatible provider and model available to your account. **Never commit `.env` or a real API key.** The demo makes real API calls and may incur charges.
+
+**Suggested path:** Step 1 → Agent 0 → Agents 1–5.
+
 ## The six modules
 
 | # | Folder | Concept | One-line description |

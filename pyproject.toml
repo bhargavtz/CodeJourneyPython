@@ -44,17 +44,17 @@ dev = [
 ml = [
     "pandas>=2.1.0",
     "numpy>=1.26.0",
-    "scikit-learn>=1.3.0",
+    "scikit-learn>=1.5.0",
     "tensorflow>=2.15.0",
-    "torch>=2.1.0",
+    "torch>=2.10.0",
     "matplotlib>=3.8.0",
     "seaborn>=0.13.0",
     "plotly>=5.18.0",
 ]
 agents = [
-    "anthropic>=0.7.0",
+    "anthropic>=1.3.9",
     "openai>=1.6.0",
-    "langchain>=0.1.0",
+    "langchain>=1.3.9",
 ]
 web = [
     "fastapi>=0.109.0",

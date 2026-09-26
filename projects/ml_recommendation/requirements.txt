@@ -1,7 +1,7 @@
 # Skyline Explorer: ML Recommendation System - Dependencies
 
 # Core ML libraries
-scikit-learn>=1.3.0         # Machine learning algorithms
+scikit-learn>=1.5.0,<2         # Machine learning algorithms
 tensorflow>=2.13.0          # Deep learning framework (optional)
 numpy>=1.23.0              # Numerical computing
 pandas>=1.5.0              # Data manipulation
